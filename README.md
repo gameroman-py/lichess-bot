@@ -1,0 +1,2 @@
+# lichess-bot
+Lichess bot

@@ -1,0 +1,13 @@
+.env
+
+*.pyc
+*.log
+*.db
+*.spec
+*.bat
+
+logs/
+temp/
+build/
+dist/
+__pycache__/
