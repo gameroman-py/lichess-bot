@@ -29,15 +29,6 @@ class Computer:
                         game = Game(self.client, event_game)
                         game.start()
 
-                    case "gameFinish":
-                        ...
-
-                    case "challengeDeclined":
-                        ...
-
-                    case "challengeCanceled":
-                        ...
-
         except Exception as e:
             print(e)
 

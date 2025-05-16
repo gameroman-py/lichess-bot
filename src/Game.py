@@ -32,7 +32,6 @@ class Game(threading.Thread):
         for event in self.stream:
             if event is None:
                 continue
-            print(f'\n\nGame event "{event.type}" \n{event}\n')
             match event.type:
                 case "gameState":
                     self.handle_state_change(event)
@@ -40,9 +39,7 @@ class Game(threading.Thread):
                     self.handle_chat_line(event)
 
     def post_message(self, message: str, spectator=False):
-        self.client.bot_write_game_chat_message(
-            self.id, "spectator" if spectator else "player", message
-        )
+        self.client.bot_write_game_chat_message(self.id, ("spectator" if spectator else "player"), message)
 
     def handle_state_change(self, game_state: schemas.GameStateEvent):
         match game_state.status:
@@ -62,9 +59,7 @@ class Game(threading.Thread):
                     print(e)
 
             case "aborted":
-                self.post_message(
-                    "You dont want to play with me?\nMaybe we will play next time"
-                )
+                self.post_message("You dont want to play with me?\nMaybe we will play next time")
 
             case "draw" | "stalemate":
                 self.post_message("This is a draw")
@@ -86,9 +81,6 @@ class Game(threading.Thread):
                     self.post_message("Yes! I checkmated you!")
                 else:
                     self.post_message("Oh no! You checkmated me!")
-
-            case _:
-                print(game_state)
 
     def handle_chat_line(self, chat_line: schemas.ChatLineEvent):
         if chat_line.username == "GameRoManBot":
