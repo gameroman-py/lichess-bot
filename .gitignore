@@ -10,4 +10,6 @@ logs/
 temp/
 build/
 dist/
+stockfish/
+
 __pycache__/

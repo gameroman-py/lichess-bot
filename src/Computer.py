@@ -21,31 +21,30 @@ class Computer:
             self.handle_event(event)
 
     def handle_event(self, event: IncomingEvent):
+        logger.info(f"Incoming event: {event.type}")
         match event.type:
             case "challenge":
                 self.handle_challenge(event.challenge)
-
             case "gameStart":
                 self.handle_game_start(event.game)
 
     def handle_challenge(self, /, challenge: schemas.ChallengeJson):
-        decline = self.client.decline_challenge
-
+        logger.info(f"New challenge: {challenge.id}")
         if challenge.variant.key != "standard":
-            decline(challenge.id, "standard")
+            self.client.decline_challenge(challenge.id, "standard")
             return
 
         time_control = challenge.timeControl
 
         if time_control.type != "clock":
-            decline(challenge.id, "timeControl")
+            self.client.decline_challenge(challenge.id, "timeControl")
             return
 
         limit = time_control.limit
         increment = time_control.increment
 
         if (limit + increment * 100) < 300:
-            decline(challenge.id, "tooFast")
+            self.client.decline_challenge(challenge.id, "tooFast")
             return
 
         self.client.accept_challenge(challenge.id)
