@@ -13,11 +13,13 @@ def main():
     ENV_FILE_PATH = os.path.join(BASE_DIR, ".env")
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="[%(asctime)s] %(levelname)-7s %(message)s",
         datefmt="%d.%m.%Y %H:%M:%S",
         handlers=[logging.StreamHandler(), logging.FileHandler(LOG_FILE_PATH, encoding="utf-8")],
     )
+
+    logger = logging.getLogger(__name__)
 
     load_dotenv(dotenv_path=ENV_FILE_PATH)
 
@@ -26,7 +28,11 @@ def main():
         raise ValueError("LICHESS_BOT_TOKEN is missing in .env")
 
     computer = Computer(LICHESS_BOT_TOKEN)
-    computer.run()
+
+    try:
+        computer.run()
+    except KeyboardInterrupt:
+        logger.info("Stopping the bot...")
 
 
 if __name__ == "__main__":

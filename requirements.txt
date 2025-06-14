@@ -1,2 +1,2 @@
 stockfish==3.28.0
-lichess-api==0.3.2
+lichess-api==0.4.0
