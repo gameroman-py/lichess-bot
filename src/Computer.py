@@ -1,6 +1,8 @@
 import logging
+from requests import HTTPError
 
-from lichess import custom, schemas, LichessClient
+from lichess import LichessClient, schemas
+from lichess.custom import ApiStreamEvent
 
 from Game import Game
 
@@ -15,13 +17,18 @@ class Computer:
     def run(self, /):
         incoming_events = self.client.stream_incoming_events()
         for event in incoming_events:
-            self.handle_event(event)
+            try:
+                self.handle_event(event)
+            except HTTPError as e:
+                logging.exception(
+                    f"HTTPError Error in handle_event (error code: {e.response.status_code})"
+                )
 
-    def handle_event(self, event: custom.ApiStreamEvent):
+    def handle_event(self, event: ApiStreamEvent):
         logger.info(f"Incoming event: {event.type}")
         match event.type:
             case "challenge":
-                self.handle_challenge(event.challenge)
+                self.handle_challenge_event(event)
             case "gameStart":
                 self.handle_game_start(event.game)
             case "challengeDeclined":
@@ -29,8 +36,14 @@ class Computer:
             case _:
                 pass
 
-    def handle_challenge(self, /, challenge: schemas.ChallengeJson):
+    def handle_challenge_event(self, /, event: schemas.ChallengeEvent):
+        challenge = event.challenge
+
         logger.info(f"New challenge: {challenge.id}")
+
+        if event.compat and not event.compat.bot:
+            self.client.decline_challenge(challenge.id, "tooFast")
+            return
 
         if challenge.variant.key != "standard":
             self.client.decline_challenge(challenge.id, "standard")
@@ -43,9 +56,5 @@ class Computer:
         self.client.accept_challenge(challenge.id)
 
     def handle_game_start(self, event_game: schemas.GameEventInfo):
-        game_id = event_game.id
-        opponent_name = event_game.opponent.username
-        self.client.bot_write_game_chat_message(game_id, "player", f"Good luck, {opponent_name}!")
-
-        game = Game(self.client, event_game)
-        game.start()
+        logger.info(f"New game started: {event_game.id}")
+        Game(self.client, event_game).start()

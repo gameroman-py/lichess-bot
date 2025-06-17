@@ -1,8 +1,10 @@
 import os
 import threading
 import logging
+from requests import HTTPError
 
-from lichess import custom, schemas, LichessClient
+from lichess import LichessClient, schemas
+from lichess.custom import BotGameStreamEvent
 
 from stockfish import Stockfish  # type: ignore
 
@@ -11,6 +13,7 @@ SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(SRC_DIR)
 
 STOCKFISH_PATH = os.path.join(BASE_DIR, "stockfish", "stockfish.exe")
+
 
 logger = logging.getLogger(__name__)
 
@@ -26,22 +29,26 @@ class Game(threading.Thread):
         self.stockfish = Stockfish(path=STOCKFISH_PATH)
 
     def run(self):
-        logger.info(f"New game started: {self.game.id}")
-        if self.game.isMyTurn:
-            self.stockfish.set_fen_position(self.game.fen)
-            self.stockfish
-            move = self.stockfish.get_best_move_time(150)
-            if move is None:
-                logger.error("Best move not found")
-                return
-            logger.info(f"Making first move: {move}")
-            self.client.make_bot_move(self.id, move)
+        self.handle_run()
 
         event_stream = self.client.stream_bot_game_state(self.game.id)
         for event in event_stream:
-            self.handle_game_event(event)
+            try:
+                self.handle_game_event(event)
+            except HTTPError as e:
+                logging.exception(
+                    f"HTTPError Error in handle_game_event (error code: {e.response.status_code})"
+                )
 
-    def handle_game_event(self, event: custom.BotGameStreamEvent):
+    def handle_run(self):
+        if self.game.isMyTurn:
+            self.stockfish.set_fen_position(self.game.fen)
+            move = self.stockfish.get_best_move_time(150)
+            assert move, "Best move not found"
+            logger.info(f"Making first move: {move}")
+            self.client.make_bot_move(self.id, move)
+
+    def handle_game_event(self, event: BotGameStreamEvent):
         logger.info(f"Bot game event: {event.type}")
         match event.type:
             case "gameState":
@@ -59,7 +66,6 @@ class Game(threading.Thread):
         match game_state.status:
             case "started":
                 self.handle_game_position(game_state)
-
             case _:
                 pass
 
