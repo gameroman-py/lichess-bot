@@ -21,7 +21,9 @@ class Computer:
                 self.handle_event(event)
             except HTTPError as e:
                 logging.exception(
-                    f"HTTPError Error in handle_event (error code: {e.response.status_code})"
+                    "HTTPError Error in handle_game_event. "
+                    f"Error code: {e.response.status_code}. "
+                    f"Error message: {e.response.reason}."
                 )
 
     def handle_event(self, event: ApiStreamEvent):

@@ -37,7 +37,9 @@ class Game(threading.Thread):
                 self.handle_game_event(event)
             except HTTPError as e:
                 logging.exception(
-                    f"HTTPError Error in handle_game_event (error code: {e.response.status_code})"
+                    "HTTPError Error in handle_game_event. "
+                    f"Error code: {e.response.status_code}. "
+                    f"Error message: {e.response.reason}."
                 )
 
     def handle_run(self):
