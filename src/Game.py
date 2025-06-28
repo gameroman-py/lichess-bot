@@ -22,9 +22,9 @@ class Game(threading.Thread):
     def __init__(self, client: LichessClient, game: schemas.GameEventInfo):
         super().__init__()
 
-        self.client = client
-        self.game = game
-        self.id = game.id
+        self.client: LichessClient = client
+        self.game: schemas.GameEventInfo = game
+        self.id: str = game.id
 
         self.stockfish = Stockfish(path=STOCKFISH_PATH)
 
