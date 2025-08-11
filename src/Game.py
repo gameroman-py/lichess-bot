@@ -1,7 +1,7 @@
-import os
 import threading
 import logging
-from requests import HTTPError
+
+from requests.exceptions import HTTPError
 
 from lichess import LichessClient, schemas
 from lichess.custom import BotGameStreamEvent
@@ -9,24 +9,18 @@ from lichess.custom import BotGameStreamEvent
 from stockfish import Stockfish  # type: ignore
 
 
-SRC_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(SRC_DIR)
-
-STOCKFISH_PATH = os.path.join(BASE_DIR, "stockfish", "stockfish.exe")
-
-
 logger = logging.getLogger(__name__)
 
 
 class Game(threading.Thread):
-    def __init__(self, client: LichessClient, game: schemas.GameEventInfo):
+    def __init__(self, client: LichessClient, game: schemas.GameEventInfo, stockfish_path: str):
         super().__init__()
 
         self.client: LichessClient = client
         self.game: schemas.GameEventInfo = game
         self.id: str = game.id
 
-        self.stockfish = Stockfish(path=STOCKFISH_PATH)
+        self.stockfish = Stockfish(path=stockfish_path)
 
     def run(self):
         self.handle_run()
@@ -36,7 +30,7 @@ class Game(threading.Thread):
             try:
                 self.handle_game_event(event)
             except HTTPError as e:
-                logging.exception(
+                logger.exception(
                     "HTTPError Error in handle_game_event. "
                     f"Error code: {e.response.status_code}. "
                     f"Error message: {e.response.reason}."
