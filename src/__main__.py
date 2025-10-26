@@ -2,7 +2,8 @@ import os
 import logging
 
 from dotenv import load_dotenv
-from Computer import Computer
+
+from .Computer import Computer
 
 
 def load_env(ENV_FILE_PATH: str):

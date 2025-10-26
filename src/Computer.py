@@ -5,7 +5,7 @@ from requests.exceptions import ChunkedEncodingError, HTTPError
 from lichess import LichessClient, schemas
 from lichess.custom import ApiStreamEvent
 
-from Game import Game
+from .Game import Game
 
 
 logger = logging.getLogger(__name__)
