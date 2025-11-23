@@ -46,7 +46,9 @@ class Computer:
             case "gameStart":
                 self.handle_game_start(event.game)
             case "challengeDeclined":
-                logger.info(f"Challenge decline reason: {event.challenge.declineReasonKey}")
+                logger.info(
+                    f"Challenge decline reason: {event.challenge.declineReasonKey}"
+                )
             case _:
                 pass
 

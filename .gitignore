@@ -2,14 +2,11 @@
 
 *.pyc
 *.log
-*.db
-*.spec
-*.bat
 
 logs/
-temp/
-build/
-dist/
-stockfish/
+
+.venv/
+
+.ruff_cache/
 
 __pycache__/

@@ -31,7 +31,10 @@ def main():
         level=logging.DEBUG,
         format="[%(asctime)s] %(levelname)-8s %(message)s",
         datefmt="%d.%m.%Y %H:%M:%S",
-        handlers=[logging.StreamHandler(), logging.FileHandler(LOG_FILE_PATH, encoding="utf-8")],
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler(LOG_FILE_PATH, encoding="utf-8"),
+        ],
     )
 
     logger = logging.getLogger(__name__)

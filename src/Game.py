@@ -13,7 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 class Game(threading.Thread):
-    def __init__(self, client: LichessClient, game: schemas.GameEventInfo, stockfish_path: str):
+    def __init__(
+        self, client: LichessClient, game: schemas.GameEventInfo, stockfish_path: str
+    ):
         super().__init__()
 
         self.client: LichessClient = client
@@ -79,7 +81,9 @@ class Game(threading.Thread):
         if turn != self.game.color:
             return  # Not our turn
 
-        time_remaining = game_state.wtime if self.game.color == "white" else game_state.btime
+        time_remaining = (
+            game_state.wtime if self.game.color == "white" else game_state.btime
+        )
         time_bonus = game_state.winc if self.game.color == "white" else game_state.binc
 
         logger.info(f"Time remaining: {time_remaining}. Time bonus: {time_bonus}")
