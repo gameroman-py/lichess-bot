@@ -1,3 +1,3 @@
-# lichess-bot
+# Lichess bot
 
-Lichess bot
+See <https://github.com/gameroman/lichess-bot>
